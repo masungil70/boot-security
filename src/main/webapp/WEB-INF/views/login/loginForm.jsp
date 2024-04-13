@@ -12,6 +12,7 @@
 <!-- 오그인시 오류 메시지 출력 -->
 
 <form action="/login" method="post">
+	<%-- csrf 토큰 설정 --%>
 	<sec:csrfInput/>
 	아이디 : <input type="text" name="email"/><br/>
 	비밀번호 : <input type="password" name="password"/><br/>
