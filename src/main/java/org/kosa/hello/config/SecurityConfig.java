@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
@@ -55,9 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		 csrf 토큰 활성화시 사용
 		 쿠키를 생성할 때 HttpOnly 태그를 사용하면 클라이언트 스크립트가 보호된 쿠키에 액세스하는 위험을 줄일 수 있으므로 쿠키의 보안을 강화할 수 있다.
 		*/
-		//http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		
-        http.csrf().disable()	// csrf 토큰을 비활성화
+        http//.csrf().disable()	// csrf 토큰을 비활성화
     	.authorizeRequests() // 요청 URL에 따라 접근 권한을 설정
 		.antMatchers("/", "/login/loginForm", "/js/**","/css/**","/image/**").permitAll() // 해당 경로들은 접근을 허용
 		.anyRequest() // 다른 모든 요청은
