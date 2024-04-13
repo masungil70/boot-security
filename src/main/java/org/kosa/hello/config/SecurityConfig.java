@@ -68,6 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.passwordParameter("password")
 		.loginPage("/login/loginForm") // 해당 주소로 로그인 페이지를 호출한다.
 		.loginProcessingUrl("/login") // 해당 URL로 요청이 오면 스프링 시큐리티가 가로채서 로그인처리를 한다. -> loadUserByName
+		.defaultSuccessUrl("/")       // 로그인 성공시 이동할 URL, 성공시 요청을 처리할 핸들러에서 설정하지 않으면 해동 설정값으로 동작함 
 		.successHandler(authSucessHandler) // 성공시 요청을 처리할 핸들러
 		.failureHandler(authFailureHandler) // 실패시 요청을 처리할 핸들러
 	.and()
