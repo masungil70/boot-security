@@ -4,18 +4,22 @@ import org.kosa.hello.member.MemberService;
 
 import java.net.URLEncoder;
 
+import org.kosa.hello.filter.JsonUsernamePasswordAuthenticationFilter;
 import org.kosa.hello.member.AuthFailureHandler;
 import org.kosa.hello.member.AuthSucessHandler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -58,9 +62,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		*/
 		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 		
+		http.apply(new MyCustomDsl());// 커스텀 필터 등록
+
         http//.csrf().disable()	// csrf 토큰을 비활성화
     	.authorizeRequests() // 요청 URL에 따라 접근 권한을 설정
-		.antMatchers("/", "/login/loginForm", "/js/**","/css/**","/image/**").permitAll() // 해당 경로들은 접근을 허용
+		.antMatchers("/", "/login/loginForm", "/resources/**").permitAll() // 해당 경로들은 접근을 허용
 		.anyRequest() // 다른 모든 요청은
 		.authenticated() // 인증된 유저만 접근을 허용
 	.and()
@@ -69,7 +75,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.passwordParameter("password")
 		.loginPage("/login/loginForm") // 해당 주소로 로그인 페이지를 호출한다.
 		.loginProcessingUrl("/login") // 해당 URL로 요청이 오면 스프링 시큐리티가 가로채서 로그인처리를 한다. -> loadUserByName
-		.defaultSuccessUrl("/")       // 로그인 성공시 이동할 URL, 성공시 요청을 처리할 핸들러에서 설정하지 않으면 해동 설정값으로 동작함 
+//		.defaultSuccessUrl("/")       // 로그인 성공시 이동할 URL, 성공시 요청을 처리할 핸들러에서 설정하지 않으면 해동 설정값으로 동작함 
 		.successHandler(authSucessHandler) // 성공시 요청을 처리할 핸들러
 		.failureHandler(authFailureHandler) // 실패시 요청을 처리할 핸들러
 	.and()
@@ -86,5 +92,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .expiredUrl("/login/loginForm?error=true&exception=" + URLEncoder.encode("세션이 만료되었습니다. 다시 로그인 해주세요", "UTF-8"))  // 세션이 만료된 경우 이동 할 페이지를 지정
     ;
 	}
+	
+	public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurity> {
+		@Override
+		public void configure(HttpSecurity http) throws Exception {
+			
+			AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
+			http.addFilterBefore(new JsonUsernamePasswordAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
+		}
+	}
+	
 
 }
