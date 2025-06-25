@@ -30,8 +30,12 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-taglibs
 	implementation 'org.springframework.security:spring-security-taglibs'
 
-	implementation 'javax.servlet:jstl:1.2'
+	implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api'
+	implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl'
 	implementation 'org.apache.tomcat.embed:tomcat-embed-jasper'
+	
+	// JSTL 추가
+    implementation 'javax.servlet:jstl:1.2'
 	
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	
